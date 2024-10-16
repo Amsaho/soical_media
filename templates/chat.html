@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Chat with AI</h1>
+        <div class="chat-box" id="chat-box">
+            <!-- Chat messages will be displayed here -->
+        </div>
+        <form id="chat-form" method="POST">
+            <input type="text" name="user_input" id="user-input" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+        </form>
+        <div id="loading" style="display: none;">Loading...</div>
+    </div>
+    
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const loading = document.getElementById('loading');
+
+        chatForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const userMessage = userInput.value;
+            chatBox.innerHTML += `<div>You: ${userMessage}</div>`;
+            userInput.value = '';
+            loading.style.display = 'block';
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_input: userMessage }),
+            });
+
+            const data = await response.json();
+            chatBox.innerHTML += `<div>AI: ${data.response}</div>`;
+            loading.style.display = 'none';
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+        });
+    </script>
+</body>
+</html>
